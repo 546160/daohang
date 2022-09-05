@@ -1,3 +1,132 @@
+//cookie
+function setCookie(name, value) {
+	var Days = 360;
+	var exp = new Date();
+	exp.setTime(exp.getTime() + Days * 24 * 60 * 60 * 1000);
+	document.cookie = escape(name) + "=" + escape(value) + ";expires=" + exp.toGMTString();
+}
+function getCookie(name) {
+	var arr, reg = new RegExp("(^| )" + escape(name) + "=([^;]*)(;|$)");
+	if (arr = document.cookie.match(reg))
+		return unescape(arr[2]);
+	else
+		return null;
+}
+function delCookie(name) {
+	var exp = new Date();
+	exp.setTime(exp.getTime() - 1);
+	var cval = getCookie(name);
+	if (cval != null)
+		document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+}
+
+function zyd_show() {
+	/* 鏄剧ず */
+	//document.querySelector(".zdy").style.display="block";
+	$(".zdy_name").val("");
+	$(".zdy_link").val("");
+
+	if ($(".zdy_button").attr("data") == "1") {
+		$(".i_r_edit").hide();
+		$(".zdy_button").attr("data", "0");
+	} else {
+		$(".i_r_edit").show();
+		$(".zdy_button").attr("data", "1");
+	}
+}
+function zdy_close() {
+	/* 闅愯棌 */
+	document.querySelector(".zdy").style.display = "none";
+	$(".i_r_edit").hide();
+}
+//鍙栨秷
+function zdy_false() {
+	/* 闅愯棌 */
+	document.querySelector(".zdy").style.display = "none";
+	$(".i_r_edit").hide();
+}
+function zyd_edit(index) {
+	/* 鏄剧ず */
+	document.querySelector(".zdy").style.display = "block";
+	var that = $($($(".jj-list-con li")[index]).children("a"));
+	$(".zdy_name").val(that.html());
+	$(".zdy_link").val(that.attr("href"));
+	//$(".i_r_edit").show();
+	$(".zdy").attr("date", index);
+}
+
+//纭畾
+function zdy_true() {
+	$(".i_r_edit").hide();
+	/* 闅愯棌 */
+	document.querySelector(".zdy").style.display = "none";
+	var name = $(".zdy_name").val();
+	var link = $(".zdy_link").val();
+	var index = $(".zdy").attr("date");
+	//console.log(name,link);
+	setCookie("zdylink_" + index, name + "_fg_" + link);
+	c_init();
+
+}
+
+
+function c_init() {
+	//$(".zdy_li").empty();
+
+	var aCookie = document.cookie.split(";");
+
+	var zdylength = 0;
+	for (var i = 0; i < aCookie.length; i++) {
+		var aCrumb = aCookie[i].split("=");
+		if (aCrumb[0].toString().trim() == 'order_list') {
+			continue;
+		}
+		var name = unescape(aCrumb[0].trim());
+
+		if (aCrumb[0].toString().trim().indexOf("zdylink_") > -1) {
+
+			zdylength = zdylength + 1;
+			var l_l_edit = $(".jj-list-con li")[name.replace("zdylink_", "")];
+			if (l_l_edit) {
+
+				var link = getCookie(name).split("_fg_");
+
+				$($(l_l_edit).children("a")).attr("href", link[1]);
+				$($(l_l_edit).children("a")).html(link[0]);
+			}
+			//$(".zdy_li").append('<li><a href="'+link +'" class="link-3" target="_blank">'+(name.replace("zdylink_",""))+'</a><div class="i_r_remove" onclick="s_r(\''+aCrumb[0]+'\');"></div></li>');
+		}
+
+	}
+	if (zdylength == 0) {
+		//$(".zdy_list").hide();
+	} else {
+		//$(".zdy_list").show();	
+	}
+
+}
+function s_r(key) {
+	delCookie(key.trim());
+	//c_init();
+}
+window.onload = function () {
+	c_init();
+	var list_li = $("._b li");
+	for (var i = list_li.length - 1; i >= 0; i--) {
+		$(list_li[i]).append('<div class="i_r_edit" onclick="zyd_edit(\'' + i + '\');"></div>');
+	}
+
+}
+// 鐧惧害缁熻浠ｇ爜寮€濮嬶紝璇峰垹闄ゆ垨鑰呬慨鏀规垚鑷繁鐨�
+var _hmt = _hmt || [];
+(function () {
+	var hm = document.createElement("script");
+	hm.src = "https://hm.baidu.com/hm.js?b556d06a5110a1a17fa2ceb5cb8a4acb";
+	var s = document.getElementsByTagName("script")[0];
+	s.parentNode.insertBefore(hm, s);
+})();
+// 鐧惧害缁熻浠ｇ爜缁撴潫
+
 $(function () {
 	// $('body').height($('body')[0].clientHeight);
 	initpage();
@@ -13,10 +142,10 @@ $(function () {
 });
 
 var sllTop;
-var divsTop = 330;/*document.getElementsByClassName('content')[0].offsetTop; 获取当前对象到其上级层顶部的距离*/
+var divsTop = 330;/*document.getElementsByClassName('content')[0].offsetTop; 鑾峰彇褰撳墠瀵硅薄鍒板叾涓婄骇灞傞《閮ㄧ殑璺濈*/
 window.onscroll = function () {
 	var onBtn = document.getElementById('top-box');
-	sllTop = document.documentElement.scrollTop || document.body.scrollTop;//如果浏览器不支持第一个事件则选择第二
+	sllTop = document.documentElement.scrollTop || document.body.scrollTop;//濡傛灉娴忚鍣ㄤ笉鏀寔绗竴涓簨浠跺垯閫夋嫨绗簩
 
 	if (sllTop >= 40) {
 		$('.header-con').css('padding', '0');
@@ -60,12 +189,12 @@ function tlistTop() {
 	var tihsHeight;
 	var list_text = document.getElementsByClassName('fa-caret-right');
 	if (list_text.length === 0) {
-		return false;  //如果匹配到0个元素，则将函数返回，不继续执行
+		return false;  //濡傛灉鍖归厤鍒�0涓厓绱狅紝鍒欏皢鍑芥暟杩斿洖锛屼笉缁х画鎵ц
 	}
-	arr1 = []; //存储元素的top距离页面顶部的高度
+	arr1 = []; //瀛樺偍鍏冪礌鐨則op璺濈椤甸潰椤堕儴鐨勯珮搴�
 	for (var i = 0; i <= 4; i++) {
 		thisHeight = document.getElementsByClassName('sethome-con')[i].offsetTop + divsTop - 80;
-		arr1.push(thisHeight); //将循环获取到的值添加到数组里面
+		arr1.push(thisHeight); //灏嗗惊鐜幏鍙栧埌鐨勫€兼坊鍔犲埌鏁扮粍閲岄潰
 	}
 
 	if (sllTop >= arr1[0]) {
@@ -105,11 +234,11 @@ $('#gotop').click(function () {
 	$('body,html').animate({
 		scrollTop: 0
 	},
-		800);//点击回到顶部按钮，缓懂回到顶部,数字越小越快
+		800);//鐐瑰嚮鍥炲埌椤堕儴鎸夐挳锛岀紦鎳傚洖鍒伴《閮�,鏁板瓧瓒婂皬瓒婂揩
 })
 
 
-/*选择搜索引擎*/
+/*閫夋嫨鎼滅储寮曟搸*/
 $('.Select-box ul').hover(function () {
 	$(this).css('height', 'auto')
 }, function () {
@@ -124,13 +253,13 @@ $('.Select-box-2 ul').hover(function () {
 $('.Select-box-2 li').click(function () {
 	var _tihs = $(this).attr('class');
 	var _html = $(this).html();
-	var _name = 'wd';
+	var _name = 'q';
 	if (_tihs == 'this_s') {
 		return "";
 	}
-	if (_tihs == 'baidu_s') {
-		_tihs = 'https://www.baidu.com/s';
-		_name = 'wd';
+	if (_tihs == 'ff_s') {
+			_tihs = 'https://fsoufsou.com/search';
+			_name = 'q';
 	} else if (_tihs == 'google_s') {
 		_tihs = 'https://www.google.com/search';
 		_name = 'q';
@@ -138,11 +267,15 @@ $('.Select-box-2 li').click(function () {
 		_tihs = 'https://www.bing.com/search';
 		_name = 'q';
 	} else if (_tihs == 'miji_s') {
-		_tihs = 'https://www.dogedoge.com/results';
+		_tihs = 'https://duckduckgo.com/';
 		_name = 'q';
-	} else {
+	} else if (_tihs == 'baidu_s') {
 		_tihs = 'https://www.baidu.com/s';
 		_name = 'wd';
+	} 
+	else {
+		_tihs = 'https://fsoufsou.com/search';
+		_name = 'q';
 	}
 	$('.baidu form').attr('action', _tihs);
 	$('.this_s').html(_html);
@@ -177,7 +310,7 @@ function _search_() {
 }
 _search_();
 
-//清空输入框内容
+//娓呯┖杈撳叆妗嗗唴瀹�
 $('.qingkong').click(function () {
 	cls();
 	$(this).css('display', 'none')
@@ -188,20 +321,20 @@ function cls() {
 	for (var i = 0; i < t.length; i++) {
 		if (t[i].type == 'text') {
 			++sum;
-			t[i].value = "";//清空 
+			t[i].value = "";//娓呯┖ 
 		}
 	}
 }
 
-//清空输入框按钮的显示和隐藏
+//娓呯┖杈撳叆妗嗘寜閽殑鏄剧ず鍜岄殣钘�
 function if_btn() {
 	var btn_obj = document.getElementById("kw") || document.getElementById("kw-2");
 	var cls_btn = document.getElementById("qingkong");
 	var btn_obj_val;
 	var times;
-	//当元素获得焦点时
+	//褰撳厓绱犺幏寰楃劍鐐规椂
 	if (btn_obj == '' || btn_obj == null) {
-		return false;  //如果没有找到这个元素，则将函数返回，不继续执行
+		return false;  //濡傛灉娌℃湁鎵惧埌杩欎釜鍏冪礌锛屽垯灏嗗嚱鏁拌繑鍥烇紝涓嶇户缁墽琛�
 	}
 	btn_obj.onfocus = function () {
 		times = setInterval(function () {
@@ -213,13 +346,30 @@ function if_btn() {
 			}
 		}, 200);
 	}
-	//元素失去焦点时
+	//鍏冪礌澶卞幓鐒︾偣鏃�
 	btn_obj.onblur = function () {
 		clearInterval(times);
 	}
 
 }
 if_btn();
+
+//棣栭〉鐨偆閫夋嫨鍒楄〃
+$('.pifu-con').hover(function () {
+	$('.iex-zuhti-list').fadeIn(250);
+	$('.pifu-con .link-list-a .fa-angle-down').addClass('fa-rotate-180');
+}, function () {
+	$('.iex-zuhti-list').fadeOut(0);
+	$('.pifu-con .link-list-a .fa-angle-down').removeClass('fa-rotate-180');
+});
+
+//寰俊浜岀淮鐮佹樉绀哄拰闅愯棌
+$('.fw-dingwei a').hover(function () {
+	$('.fw-weixing').fadeIn(250);
+}, function () {
+	$('.fw-weixing').fadeOut(0);
+});
+
 
 $('.muban li').click(function () {
 	_index = $(this).index();
@@ -233,10 +383,10 @@ $('.ruanjian-tab li').click(function () {
 });
 
 $('.list-link-4').hover(function () {
-	//获取当前元素的title内容，赋值给_thisTit
+	//鑾峰彇褰撳墠鍏冪礌鐨則itle鍐呭锛岃祴鍊肩粰_thisTit
 	var _thisTit = $(this).attr('data-title');
-	//tips提示内容为_thisTit（即等于当前鼠标滑过元素的title内容），吸附对象为当前鼠标滑过对象
-	if (_thisTit != "") {	//判断条件，当前元素的data-title不等于空才执行下面的代码
+	//tips鎻愮ず鍐呭涓篲thisTit锛堝嵆绛変簬褰撳墠榧犳爣婊戣繃鍏冪礌鐨則itle鍐呭锛夛紝鍚搁檮瀵硅薄涓哄綋鍓嶉紶鏍囨粦杩囧璞�
+	if (_thisTit != "") {	//鍒ゆ柇鏉′欢锛屽綋鍓嶅厓绱犵殑data-title涓嶇瓑浜庣┖鎵嶆墽琛屼笅闈㈢殑浠ｇ爜
 		layer.tips(_thisTit, this, {
 			tips: [1, '#1E9FFF'],
 			time: 99999,
@@ -253,7 +403,7 @@ $("#qingkong").click(function () {
 	oUl.style.display = 'none';
 })
 
-// 搜索联想
+// 鎼滅储鑱旀兂
 btn.keyup(function (e) {
 	if (e.keyCode == 13 || e.keyCode == 40 || e.keyCode == 38) {
 		e.preventDefault();
@@ -271,7 +421,7 @@ btn.keyup(function (e) {
 
 })
 
-// 控制搜索时显示联想内容的数量
+// 鎺у埗鎼滅储鏃舵樉绀鸿仈鎯冲唴瀹圭殑鏁伴噺
 function aa(data) {
 	//console.log(data);
 	oUl.style.display = 'block';
@@ -279,7 +429,7 @@ function aa(data) {
 	var str = '';
 
 	for (var i = 0; i < list.length; i++) {
-		// 最多显示8行
+		// 鏈€澶氭樉绀�8琛�
 		if (i < 8) {
 			str += '<li>' + list[i] + '</li>';
 		}
@@ -295,15 +445,15 @@ $(".keylist").on('click', 'li', function () {
 	oUl.style.display = 'none';
 });
 
-//利用键盘控制选择搜索联想词
+//鍒╃敤閿洏鎺у埗閫夋嫨鎼滅储鑱旀兂璇�
 $(document).keydown(function (e) {
 
 	if (e.keyCode == 13 && oUl.style.display == 'block') {
 		btn.val($(".keylist li.active").html().trim());
 		$('#su-2').click();
 		oUl.style.display = 'none';
-		//alert('你按下了Enter'); 
-	} else if (e && e.keyCode == 40 && oUl.style.display == 'block') { //下
+		//alert('浣犳寜涓嬩簡Enter'); 
+	} else if (e && e.keyCode == 40 && oUl.style.display == 'block') { //涓�
 		//active
 		if ($(".keylist li.active").length > 0) {
 			var k1 = $(".keylist li.active")
@@ -313,7 +463,7 @@ $(document).keydown(function (e) {
 			var k0 = $($(".keylist li")[0]);
 			k0.addClass("active");
 		}
-	} else if (e && e.keyCode == 38 && oUl.style.display == 'block') { // 上
+	} else if (e && e.keyCode == 38 && oUl.style.display == 'block') { // 涓�
 
 		var k1 = $(".keylist li.active")
 		k1.prev().addClass("active");
@@ -323,7 +473,6 @@ $(document).keydown(function (e) {
 	}
 
 });
-
 
 
 
